@@ -2,9 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    // KSP version should match the Kotlin plugin version
-    id("com.google.devtools.ksp") version "2.0.21-1.0.16"
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
+    // KSP plugin is applied from the root build.gradle.kts
+    id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
 }
 
 android {
