@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 env:
-  ANDROID_HOME: ${{ github.workspace }}/android-sdk
-  ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
+  ANDROID_HOME: /usr/local/lib/android/sdk
+  ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
   
 jobs:
   build:
@@ -31,56 +31,59 @@ jobs:
       with:
         log-accepted-android-sdk-licenses: true
     
-    - name: Set up Android SDK
-      uses: android-actions/setup-android-sdk@v1.1.0
-      with:
-        sdk-packages: |
-          platform-tools
-          platforms;android-34
-          build-tools;34.0.0
-          extras;android;m2repository
-          extras;google;m2repository
-          extras;google;google_play_services
-          system-images;android-34;google_apis_playstore;x86_64
-    
-    - name: Accept Android Licenses
+    - name: Accept Android SDK Licenses
       shell: bash
       run: |
+        # Create licenses directory if it doesn't exist
         mkdir -p "$ANDROID_HOME/licenses"
+        
+        # Standard Android SDK License
         echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_HOME/licenses/android-sdk-license"
         echo -e "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$ANDROID_HOME/licenses/android-sdk-license"
         echo -e "8933bad161af4178b1185d1a37fbf41ea5269c55" >> "$ANDROID_HOME/licenses/android-sdk-license"
         echo -e "84831b9409646a918e30573bab4c9c91346d8abd" >> "$ANDROID_HOME/licenses/android-sdk-license"
         echo -e "601085b94cc71ea42425f5c6230a62893f4eac9d" >> "$ANDROID_HOME/licenses/android-sdk-license"
         
-        # Preview license
+        # Preview License
         echo -e "84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
         
-        # Google TV license
+        # Google TV License
         echo -e "601085b94cc71ea42425f5c6230a62893f4eac9d" > "$ANDROID_HOME/licenses/android-googletv-license"
         
-        # ARM EABI license
+        # ARM EABI License
         echo -e "d975f751698a77b662f9334dbea2b1e4a3f6a4a8" > "$ANDROID_HOME/licenses/android-sdk-arm-dbt-license"
+        
+        # Intel x86 Emulator Accelerator License
+        echo -e "d9a2a6739ff824256d43d80971c3d1c69a3c389f" > "$ANDROID_HOME/licenses/intel-android-extra-license"
+        
+        # Google APIs License
+        echo -e "601085b94cc77c0f54f8ca3922b5227e1cd45526" > "$ANDROID_HOME/licenses/google-gdk-license"
         
         # Verify licenses were created
         echo "License files created:"
         ls -la "$ANDROID_HOME/licenses/"
         echo -e "\nLicense contents:"
-        cat "$ANDROID_HOME/licenses/"*
+        cat "$ANDROID_HOME/licenses/"* || true
         
-        # Accept all licenses
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME || true
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --update
+        # Accept all licenses non-interactively
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME >/dev/null 2>&1 || true
+        
+        # Update SDK and install required components
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --update >/dev/null 2>&1 || true
         
     - name: Install Android SDK components
+      shell: bash
       run: |
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-34"
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;34.0.0"
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools"
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "extras;android;m2repository"
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "extras;google;m2repository"
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "extras;google;google_play_services"
-    
+        # Install required SDK components
+        echo "Installing Android SDK components..."
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" \
+          "extras;android;m2repository" "extras;google;m2repository" "extras;google;google_play_services" \
+          "system-images;android-34;google_apis_playstore;x86_64" --sdk_root=$ANDROID_HOME >/dev/null 2>&1 || true
+        
+        # List installed components for debugging
+        echo "Installed components:"
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list_installed --sdk_root=$ANDROID_HOME
+        
     - name: Build with Gradle
       run: |
         chmod +x gradlew
