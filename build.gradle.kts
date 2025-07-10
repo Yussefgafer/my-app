@@ -2,7 +2,7 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
-    alias(libs.plugins.compose.android) apply false
+    alias(libs.plugins.compose) apply false  // Using the main compose plugin
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hilt) apply false
 }

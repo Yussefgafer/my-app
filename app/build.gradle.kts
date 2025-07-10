@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.compose.android)  // Using the Android Compose plugin
+    alias(libs.plugins.compose)  // Using the main Compose plugin
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     kotlin("plugin.serialization") version libs.versions.kotlin.get()
