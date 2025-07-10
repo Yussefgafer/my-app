@@ -1,11 +1,23 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.compose)  // Using the main Compose plugin
+    alias(libs.plugins.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     kotlin("plugin.serialization") version libs.versions.kotlin.get()
     id("kotlin-parcelize")
+}
+
+android {
+    // ... existing android configuration ...
+    
+    buildFeatures {
+        compose = true
+    }
+    
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
+    }
 }
 
 // Add repositories for all projects
