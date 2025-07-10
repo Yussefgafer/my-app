@@ -32,16 +32,36 @@ jobs:
     - name: Accept Android SDK Licenses
       shell: bash
       run: |
+        # Create licenses directory if it doesn't exist
         mkdir -p "$ANDROID_HOME/licenses"
-        echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee\nd56f5187479451eabf01fb78af6dfcb131a6481e\n8933bad161af4178b1185d1a37fbf41ea5269c55\n84831b9409646a918e30573bab4c9c91346d8abd\n601085b94cc71ea42425f5c6230a62893f4eac9d" > "$ANDROID_HOME/licenses/android-sdk-license"
-        echo -e "84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
-        echo -e "d975f751698a77b662f9334dbea2b1e4a3f6a4a8" > "$ANDROID_HOME/licenses/android-sdk-license-2746d5c9"
-        echo -e "601085b94cc77c0f54f8ca3922b5227e1cd45526" > "$ANDROID_HOME/licenses/google-gdk-license"
-        echo -e "e9acab5b5fbb560a72cfaecce8946896ff6aab9d" > "$ANDROID_HOME/licenses/mips-android-sysimage-license"
-        echo -e "d9a2a6739ff824256d43d80971c3d1c69a3c389f" > "$ANDROID_HOME/licenses/intel-android-extra-license"
         
-        # Accept all licenses
+        # Accept all standard Android SDK licenses
+        echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
+        echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$ANDROID_HOME/licenses/android-sdk-license"
+        echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" >> "$ANDROID_HOME/licenses/android-sdk-license"
+        echo "8933bad161af4178b1185d1a37fbf41ea5269c55" >> "$ANDROID_HOME/licenses/android-sdk-license"
+        echo "84831b9409646a918e30573bab4c9c91346d8abd" >> "$ANDROID_HOME/licenses/android-sdk-license"
+        
+        # Accept preview license
+        echo "84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+        
+        # Accept Google TV license
+        echo "601085b94cc71ea42425f5c6230a62893f4eac9d" > "$ANDROID_HOME/licenses/android-googletv-license"
+        
+        # Accept other licenses
+        echo "d975f751698a77b662f9334dbea2b1e4a3f6a4a8" > "$ANDROID_HOME/licenses/android-sdk-license-2746d5c9"
+        echo "d9a2a6739ff824256d43d80971c3d1c69a3c389f" > "$ANDROID_HOME/licenses/intel-android-extra-license"
+        echo "e9acab5b5fbb560a72cfaecce8946896ff6aab9d" > "$ANDROID_HOME/licenses/mips-android-sysimage-license"
+        
+        # Verify licenses were created
+        echo "License files created:"
+        ls -la "$ANDROID_HOME/licenses/"
+        
+        # Accept all licenses non-interactively
         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME >/dev/null 2>&1 || true
+        
+        # Update SDK
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --update --sdk_root=$ANDROID_HOME >/dev/null 2>&1 || true
     
     - name: Install Android SDK components
       shell: bash
