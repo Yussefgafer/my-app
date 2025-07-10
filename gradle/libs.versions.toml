@@ -30,10 +30,15 @@ room = "2.6.1"
 work = "2.9.0"
 
 [plugins]
+# Android and Kotlin
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
+# KSP
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+# Hilt
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 [libraries]
@@ -70,16 +75,3 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 
 # WorkManager
 work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work" }
-
-[plugins]
-# Android and Kotlin
-android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
-# KSP
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-
-# Hilt
-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-
