@@ -1,9 +1,8 @@
 [versions]
 # Android Gradle Plugin and Kotlin
 agp = "8.4.0"
-kotlin = "1.9.23"  # Compatible with KSP 1.9.23-1.0.19
-# KSP version should match the Kotlin version
-ksp = "1.9.23-1.0.19"  # KSP version compatible with Kotlin 2.0.21
+kotlin = "1.9.23"  # Using stable Kotlin version
+ksp = "1.9.23-1.0.19"  # KSP version compatible with Kotlin 1.9.23
 
 # AndroidX Core
 coreKtx = "1.13.1"
@@ -17,8 +16,7 @@ espressoCore = "3.5.1"
 
 # Compose
 composeBom = "2024.06.00"
-composeCompiler = "1.5.9"
-composePlugin = "1.5.9"  # Using the same version as compose-compiler
+composeCompiler = "1.5.9"  # Must match Kotlin version compatibility
 androidxCompose = "1.5.4"  # Using stable AndroidX Compose version
 
 # Hilt
@@ -35,14 +33,9 @@ work = "2.9.0"
 # Android and Kotlin
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 # KSP
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-
-# Compose
-# Use AndroidX Compose plugin for Android
-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 # Hilt
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
