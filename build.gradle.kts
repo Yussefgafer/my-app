@@ -31,6 +31,16 @@ allprojects {
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://maven.google.com")
     }
+    
+    // Configure all projects to use the same Kotlin version
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions {
+            jvmTarget = JavaVersion.VERSION_17.toString()
+            freeCompilerArgs = freeCompilerArgs + listOf(
+                "-opt-in=kotlin.RequiresOptIn"
+            )
+        }
+    }
 }
 
 tasks.register("clean", Delete::class) {
