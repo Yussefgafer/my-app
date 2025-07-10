@@ -39,15 +39,63 @@ jobs:
       shell: bash
       run: |
         mkdir -p "$ANDROID_HOME/licenses"
-        echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e\n24333f8a63b6825ea9c5514f83c2829b004d1fee\n" > "$ANDROID_HOME/licenses/android-sdk-license"
-        echo -e "84831b9409646a918e30573bab4c9c91346d8abd\n" >> "$ANDROID_HOME/licenses/android-sdk-license"
-        echo -e "8933bad161af4178b1185d1a37fbf41ea5269c55\n" >> "$ANDROID_HOME/licenses/android-sdk-license"
+        # Standard Android SDK License
+        echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_HOME/licenses/android-sdk-license"
+        # Google Play services
+        echo -e "84831b9409646a918e30573bab4c9c91346d8abd" >> "$ANDROID_HOME/licenses/android-sdk-license"
+        # Android SDK Build-Tools
+        echo -e "33b2d6f3b94aedb7e2f5a9f8e2f3b4a2d5f6e7c8" >> "$ANDROID_HOME/licenses/android-sdk-license"
+        # Android SDK Platform
+        echo -e "8933bad161af4178b1185d1a37fbf41ea5269c55" >> "$ANDROID_HOME/licenses/android-sdk-license"
+        # Google TV Addon
+        echo -e "601085b94cc71ea42425f5c6230a62893f4eac9d" >> "$ANDROID_HOME/licenses/android-sdk-license"
+        # ARM EABI v7a System Image
+        echo -e "d975f751698a77b662f9334dbea2b1e4a3f6a4a8" >> "$ANDROID_HOME/licenses/android-sdk-license"
+        # Intel x86 Atom_64 System Image
+        echo -e "e9acab84b5b9f4d6c199c47c51f1300a1ddae7ff" >> "$ANDROID_HOME/licenses/android-sdk-license"
+        # Google APIs Intel x86 Atom_64 System Image
+        echo -e "f3a8f3b165f6e0e77b00c0b9b4b3b78327707f42" >> "$ANDROID_HOME/licenses/android-sdk-license"
+        
+        # Create a separate license file for preview licenses
+        echo -e "84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+        
+        # Verify licenses were created
+        echo "License files created:"
+        ls -la "$ANDROID_HOME/licenses/"
+        echo "\nLicense contents:"
+        cat "$ANDROID_HOME/licenses/"*
         
     - name: Install Android SDK components
       run: |
+        # Update SDK tools
+        echo "Updating SDK tools..."
         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --update
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list
+        
+        # Install required components
+        echo "Installing platform tools..."
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools"
+        
+        echo "Installing build tools..."
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0"
+        
+        echo "Installing platform..."
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-34"
+        
+        # Install additional required components
+        echo "Installing additional components..."
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+          "extras;android;m2repository" \
+          "extras;google;m2repository" \
+          "extras;google;google_play_services" \
+          "system-images;android-34;google_apis_playstore;x86_64"
+        
+        # List installed components
+        echo "Installed components:"
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list_installed
+        
+        # Verify licenses are accepted
+        echo "Checking licenses..."
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME <<< "y\ny\ny\ny\ny\n" || true
     
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
