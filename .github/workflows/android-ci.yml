@@ -41,6 +41,10 @@ jobs:
         echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e" >> $ANDROID_HOME/licenses/android-sdk-license
         echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > $ANDROID_HOME/licenses/android-sdk-license
         
+        # Accept additional licenses
+        echo -e "\n84831b9409646a918e30573bab4c9c91346d8ecd" > $ANDROID_HOME/licenses/android-sdk-preview-license
+        echo -e "\nd975f751698a77b662f9334dbeeb7fb70ea5acd1" > $ANDROID_HOME/licenses/android-sdk-license
+        
         echo "Accepted licenses:"
         cat $ANDROID_HOME/licenses/*
     
@@ -61,6 +65,12 @@ jobs:
         echo "Installing platform..."
         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-34"
         
+        # Install NDK and CMake for native code
+        echo "Installing NDK and CMake..."
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+          "ndk;25.2.9519653" \
+          "cmake;3.22.1"
+        
         # Install additional required components
         echo "Installing additional components..."
         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
@@ -68,17 +78,28 @@ jobs:
           "extras;google;m2repository" \
           "extras;google;google_play_services" \
           "cmdline-tools;latest" \
-          "emulator"
+          "emulator" \
+          "system-images;android-34;google_apis;x86_64"
         
         # Verify installation
         echo "Installed components:"
         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list_installed
     
+    - name: Set up Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-home-cache-cleanup: true
+    
     - name: Build with Gradle
       run: |
         chmod +x gradlew
-        ./gradlew build --stacktrace
-        
+        ./gradlew build --stacktrace --info --scan
+    
+    - name: Run tests
+      run: |
+        ./gradlew testDebugUnitTest
+        ./gradlew connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.notAnnotation=androidx.test.filters.FlakyTest
+    
     - name: Upload build artifacts
       if: ${{ always() }}
       uses: actions/upload-artifact@v4
@@ -92,12 +113,17 @@ jobs:
         retention-days: 7
     
     - name: List installed components
+      if: ${{ failure() }}
       shell: bash
       run: |
         echo "Installed components:"
         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list_installed
-    
-    - name: Verify licenses
+        
+        echo "Environment variables:"
+        env | sort
+        
+        echo "Gradle properties:"
+        cat gradle.properties || true
       shell: bash
       run: |
         echo "Checking licenses..."

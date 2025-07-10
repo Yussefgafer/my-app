@@ -1,8 +1,8 @@
 [versions]
 # Android Gradle Plugin and Kotlin
-agp = "8.4.0"
-kotlin = "1.9.22"  # Using stable Kotlin version with better compatibility
-ksp = "1.9.22-1.0.16"  # KSP version compatible with Kotlin 1.9.22
+agp = "8.2.2"
+kotlin = "2.0.21"
+ksp = "2.0.21-1.0.16"  # KSP version compatible with Kotlin 2.0.21
 
 # AndroidX Core
 coreKtx = "1.12.0"
@@ -15,16 +15,19 @@ junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 
 # Compose
-composeBom = "2023.08.00"
-composeCompiler = "1.5.4"  # Must match Kotlin version compatibility
-androidxCompose = "1.5.4"  # Using stable AndroidX Compose version
+composeBom = "2024.04.01"
+composeCompiler = "1.5.12"  # Must match Kotlin version compatibility
+androidxCompose = "1.6.3"  # Using stable AndroidX Compose version
 
 # Hilt
 hilt = "2.50"
-hiltNavigationCompose = "1.1.0"
+hiltNavigationCompose = "1.2.0"
 
 # Room
 room = "2.6.1"
+
+# WorkManager
+work = "2.9.0"
 
 # WorkManager
 work = "2.9.0"
