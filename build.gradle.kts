@@ -2,9 +2,18 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
-    alias(libs.plugins.compose) apply false
+    alias(libs.plugins.compose.android) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hilt) apply false
+}
+
+// Add JetBrains Compose repository
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    }
 }
 
 // Define versions in a single place

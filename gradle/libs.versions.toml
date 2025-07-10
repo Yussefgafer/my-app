@@ -18,7 +18,7 @@ espressoCore = "3.5.1"
 # Compose
 composeBom = "2024.06.00"
 composeCompiler = "1.5.9"
-composePlugin = "1.5.9"
+composePlugin = "1.5.0"  # Using a stable version from JetBrains repository
 
 # Hilt
 hilt = "2.50"
@@ -41,6 +41,9 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 # Compose
 compose = { id = "org.jetbrains.compose", version.ref = "composePlugin" }
+
+# AndroidX Compose
+compose-android = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 # Hilt
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
