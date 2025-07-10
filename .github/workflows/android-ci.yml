@@ -44,14 +44,9 @@ jobs:
           system-images;android-34;google_apis_playstore;x86_64
     
     - name: Accept Android Licenses
+      shell: bash
       run: |
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME || true
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --update
-        
-        # Create licenses directory if it doesn't exist
         mkdir -p "$ANDROID_HOME/licenses"
-        
-        # Accept all licenses
         echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_HOME/licenses/android-sdk-license"
         echo -e "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$ANDROID_HOME/licenses/android-sdk-license"
         echo -e "8933bad161af4178b1185d1a37fbf41ea5269c55" >> "$ANDROID_HOME/licenses/android-sdk-license"
@@ -67,11 +62,29 @@ jobs:
         # ARM EABI license
         echo -e "d975f751698a77b662f9334dbea2b1e4a3f6a4a8" > "$ANDROID_HOME/licenses/android-sdk-arm-dbt-license"
         
-        # Verify licenses
+        # Verify licenses were created
         echo "License files created:"
         ls -la "$ANDROID_HOME/licenses/"
-        echo "\nLicense contents:"
+        echo -e "\nLicense contents:"
         cat "$ANDROID_HOME/licenses/"*
+        
+        # Accept all licenses
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME || true
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --update
+        
+    - name: Install Android SDK components
+      run: |
+        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-34"
+        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;34.0.0"
+        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools"
+        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "extras;android;m2repository"
+        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "extras;google;m2repository"
+        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "extras;google;google_play_services"
+    
+    - name: Build with Gradle
+      run: |
+        chmod +x gradlew
+        ./gradlew build --stacktrace
         
     - name: Install Android SDK components
       run: |
