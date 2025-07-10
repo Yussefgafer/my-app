@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+# Add permissions for the workflow
+permissions:
+  contents: read
+  packages: write
+  actions: write
+  security-events: write
+
 jobs:
   build:
     name: Build and Test
@@ -13,7 +20,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -44,21 +51,23 @@ jobs:
 
     - name: Upload APK
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: app-debug
         path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 5
+        if-no-files-found: warn
 
     - name: Upload build reports
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-reports
         path: |
           app/build/reports/
           app/build/outputs/logs/
         retention-days: 5
+        if-no-files-found: ignore
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
@@ -73,16 +82,18 @@ jobs:
 
     - name: Upload Release APK
       if: github.ref == 'refs/heads/main' || github.event_name == 'release'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: app-release
         path: app/build/outputs/apk/release/app-release.apk
         retention-days: 5
+        if-no-files-found: warn
 
     - name: Upload mapping file
       if: github.ref == 'refs/heads/main' || github.event_name == 'release'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: mapping
         path: app/build/outputs/mapping/release/mapping.txt
         retention-days: 5
+        if-no-files-found: warn
