@@ -28,11 +28,8 @@ dependencyResolutionManagement {
         maven("https://maven.google.com")
     }
     
-    versionCatalogs {
-        create("libs") {
-            from(files("gradle/libs.versions.toml"))
-        }
-    }
+    // Version catalog is defined in libs.versions.toml and will be automatically included
+    // No need to explicitly call from() here as it's already defined in the TOML file
 }
 
 rootProject.name = "ChateX"
