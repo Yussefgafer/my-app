@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application) apply true
     alias(libs.plugins.kotlin.android) apply true
     alias(libs.plugins.ksp) apply true
-    alias(libs.plugins.hilt.android) apply true
+    alias(libs.plugins.hilt) apply true
     kotlin("plugin.serialization") version libs.versions.kotlin.get()
     kotlin("kapt")
     id("kotlin-parcelize")
@@ -86,7 +86,6 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     
     // Compose
-    val composeBom = platform(libs.androidx.compose.bom)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
@@ -97,43 +96,18 @@ dependencies {
     
     // Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+    kapt(libs.hilt.compiler)
     
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
     
-    // WorkManager
+    // WorkManager with Hilt integration
     implementation(libs.work.runtime.ktx)
     implementation(libs.hilt.work)
     kapt(libs.hilt.compiler)
-    
-    // Testing
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-    
-    // Hilt
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
-    
-    // Room
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    ksp(libs.room.compiler)
-    
-    // WorkManager
-    implementation(libs.work.runtime.ktx)
-    
-    // Hilt WorkManager integration
-    implementation(libs.hilt.work)
     
     // Supabase
     implementation(platform("io.github.jan-tennert.supabase:bom:2.2.1")) {
@@ -164,4 +138,11 @@ dependencies {
     
     // Kotlinx Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    
+    // Testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
 }

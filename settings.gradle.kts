@@ -33,12 +33,14 @@ dependencyResolutionManagement {
         maven("https://maven.google.com")
     }
     
-    // Version catalog is defined in gradle/libs.versions.toml and will be automatically included
-    // No need to explicitly define it here as it causes duplicate definition
+    // Version catalog configuration
+    versionCatalogs {
+        create("libs") {
+            // This will automatically use the libs.versions.toml file
+            from(files("gradle/libs.versions.toml"))
+        }
+    }
 }
-
-// Enable feature preview for version catalogs
-enableFeaturePreview("VERSION_CATALOGS")
 
 rootProject.name = "ChateX"
 include(":app")
