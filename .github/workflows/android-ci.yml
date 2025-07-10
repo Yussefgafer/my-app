@@ -28,59 +28,24 @@ jobs:
     
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
+      with:
+        android-sdk-file: ${{ secrets.ANDROID_SDK_FILE }}
     
-    - name: Make license script executable
-      run: chmod +x ./scripts/accept-android-licenses.sh
-
     - name: Accept Android SDK licenses
       shell: bash
       run: |
-        # Run the license acceptance script
-        ./scripts/accept-android-licenses.sh
+        mkdir -p $ANDROID_HOME/licenses/
+        echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > $ANDROID_HOME/licenses/android-sdk-license
+        echo -e "\n601085b94cd868dc0280f56bf00d3fb361a4d745" >> $ANDROID_HOME/licenses/android-sdk-license
+        echo -e "\n33b6a2b64607f5b2f59edb85f6e435f77cecabb7" >> $ANDROID_HOME/licenses/android-sdk-license
+        echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e" >> $ANDROID_HOME/licenses/android-sdk-license
+        echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > $ANDROID_HOME/licenses/android-sdk-license
         
-        # Verify licenses were accepted
-        echo "Verifying accepted licenses..."
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME --verbose || true
+        echo "Accepted licenses:"
+        cat $ANDROID_HOME/licenses/*
     
     - name: Install Android SDK components
       shell: bash
-      run: |
-        # Install required SDK components
-        echo "Installing Android SDK components..."
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install \
-          "platform-tools" \
-          "platforms;android-34" \
-          "build-tools;34.0.0" \
-          "extras;android;m2repository" \
-          "extras;google;m2repository" \
-          "extras;google;google_play_services" \
-          "cmdline-tools;latest" \
-          "emulator" \
-          "patcher;v4" \
-          --sdk_root=$ANDROID_HOME
-        
-        # Verify installation
-        echo "Installed components:"
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list_installed --sdk_root=$ANDROID_HOME
-    
-    - name: Build with Gradle
-      run: |
-        chmod +x gradlew
-        ./gradlew build --stacktrace
-        
-    - name: Upload build artifacts
-      if: ${{ always() }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-artifacts
-        path: |
-          **/build/outputs/**/*.apk
-          **/build/outputs/**/*.aab
-          **/build/reports/**/*
-          **/build/logs/**/*
-        retention-days: 7
-        
-    - name: Install Android SDK components
       run: |
         # Update SDK tools
         echo "Updating SDK tools..."
@@ -102,13 +67,39 @@ jobs:
           "extras;android;m2repository" \
           "extras;google;m2repository" \
           "extras;google;google_play_services" \
-          "system-images;android-34;google_apis_playstore;x86_64"
+          "cmdline-tools;latest" \
+          "emulator"
         
-        # List installed components
+        # Verify installation
         echo "Installed components:"
         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list_installed
+    
+    - name: Build with Gradle
+      run: |
+        chmod +x gradlew
+        ./gradlew build --stacktrace
         
-        # Verify licenses are accepted
+    - name: Upload build artifacts
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: |
+          **/build/outputs/**/*.apk
+          **/build/outputs/**/*.aab
+          **/build/reports/**/*
+          **/build/logs/**/*
+        retention-days: 7
+    
+    - name: List installed components
+      shell: bash
+      run: |
+        echo "Installed components:"
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list_installed
+    
+    - name: Verify licenses
+      shell: bash
+      run: |
         echo "Checking licenses..."
         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME <<< "y\ny\ny\ny\ny\n" || true
     
