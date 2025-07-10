@@ -5,6 +5,7 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+  workflow_dispatch:
 
 # Add permissions for the workflow
 permissions:
@@ -12,6 +13,15 @@ permissions:
   packages: write
   actions: write
   security-events: write
+
+env:
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true
+  GRADLE_BUILD_CACHE: true
+  GRADLE_WORKER_MAX: 4
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   build:
@@ -25,39 +35,33 @@ jobs:
         fetch-depth: 0
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
         cache: 'gradle'
 
     - name: Validate Gradle Wrapper
-      uses: gradle/wrapper-validation-action@v1
+      uses: gradle/wrapper-validation-action@v2
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Build with Gradle
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        build-tools-version: '34.0.0'
+        ndk-version: '25.2.9519653'
+        cmake-version: '3.22.1'
+        
+    - name: Build and Test
       run: |
-        ./gradlew build --stacktrace
-
-    - name: Run tests
-      run: |
-        ./gradlew test
-
+        ./gradlew build testDebugUnitTest lintDebug --stacktrace --info --scan
+        
     - name: Lint check
       run: |
         ./gradlew lintDebug
-
-    - name: Upload APK
-      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-debug
-        path: app/build/outputs/apk/debug/app-debug.apk
-        retention-days: 5
-        if-no-files-found: warn
-
+        
     - name: Upload build reports
       if: always()
       uses: actions/upload-artifact@v4
@@ -66,19 +70,22 @@ jobs:
         path: |
           app/build/reports/
           app/build/outputs/logs/
-        retention-days: 5
+        retention-days: 7
         if-no-files-found: ignore
-
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v2
-      with:
-        build-tools-version: '34.0.0'
-        ndk-version: '25.2.9519653'
 
     - name: Build Release APK
       if: github.ref == 'refs/heads/main' || github.event_name == 'release'
       run: |
-        ./gradlew assembleRelease
+        ./gradlew assembleRelease --stacktrace --info
+
+    - name: Upload Debug APK
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 7
+        if-no-files-found: warn
 
     - name: Upload Release APK
       if: github.ref == 'refs/heads/main' || github.event_name == 'release'
@@ -86,7 +93,7 @@ jobs:
       with:
         name: app-release
         path: app/build/outputs/apk/release/app-release.apk
-        retention-days: 5
+        retention-days: 7
         if-no-files-found: warn
 
     - name: Upload mapping file
@@ -94,6 +101,8 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: mapping
-        path: app/build/outputs/mapping/release/mapping.txt
-        retention-days: 5
+        path: |
+          app/build/outputs/mapping/release/mapping.txt
+          app/build/outputs/native-debug-symbols/release/
+        retention-days: 30
         if-no-files-found: warn
